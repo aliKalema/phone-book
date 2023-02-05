@@ -1,0 +1,20 @@
+version: '3'
+services:
+  phone-book:
+    build: .
+    container_name: phone-book
+    network_mode: host
+    depends_on:
+      - phone-book-mysql
+
+  phone-book-mysql:
+    image: mysql:8.0.26
+    container_name: phone-book-mysql
+    ports:
+      - 3303:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=phoneBook
+    volumes:
+      - ./scripts:/docker-entrypoint-initdb.d/
+      - ./conf:/etc/mysql/conf.d
