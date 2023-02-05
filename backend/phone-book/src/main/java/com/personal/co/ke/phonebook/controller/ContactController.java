@@ -22,6 +22,11 @@ public class ContactController {
         return contactService.getAll(searchTerm, sort);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteContact(@PathVariable String id){
+         contactService.deleteContact(Long.parseLong(id));
+    }
+
     @GetMapping("/{id}")
     public Contact getById(@PathVariable String id){
         return contactService.getById(Long.parseLong(id));

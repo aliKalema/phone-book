@@ -16,10 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
-import java.util.Spliterators;
 import java.util.UUID;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +26,7 @@ public class ContactService {
     private final ContactRepository contactRepository;
 
     public List<Contact> getAll(String searchTerm, String sort) {
-        if(searchTerm.isEmpty()){
+        if(isNullorEmpty(searchTerm)){
             return contactRepository.findAll(Sort.by(Sort.Direction.DESC, "firstName"));
         }
         return contactRepository.findByFilter(searchTerm);
@@ -42,8 +39,7 @@ public class ContactService {
     public Contact addContact(Contact contact, MultipartFile multipartFile) {
         if(multipartFile != null){
             try{
-                String extension = com.google.common.io.Files.getFileExtension(multipartFile.getOriginalFilename());
-                String fileName = new StringBuilder().append(UUID.randomUUID().toString() + "-" + multipartFile.getOriginalFilename()).append(String.valueOf(multipartFile.getSize())).append(".").append(extension).toString();
+                String fileName = new StringBuilder().append(UUID.randomUUID().toString() + "-" + multipartFile.getOriginalFilename()).toString().trim();
                 byte[] bytes = multipartFile.getBytes();
                 Path path = Paths.get("src/main/resources/static/uploads/" + fileName);
                 Files.write(path, bytes);
@@ -60,5 +56,16 @@ public class ContactService {
 
     private Sort getSort(String sort){
         return sort.equals("desc") ? Sort.by(Sort.Direction.DESC, "firstName") : Sort.by(Sort.Direction.ASC, "firstName");
+    }
+
+    private boolean isNullorEmpty(String str){
+        if(str==null || str.isEmpty()){
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteContact(long id) {
+        contactRepository.deleteById(id);
     }
 }
