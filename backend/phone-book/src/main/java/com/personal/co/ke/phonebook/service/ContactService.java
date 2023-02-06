@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -27,9 +28,27 @@ public class ContactService {
 
     public List<Contact> getAll(String searchTerm, String sort) {
         if(isNullorEmpty(searchTerm)){
-            return contactRepository.findAll(Sort.by(Sort.Direction.DESC, "firstName"));
+            if(isNullorEmpty(sort)){
+               return contactRepository.findAll();
+            }
+            else if(sort.equalsIgnoreCase("desc")){
+                return contactRepository.findAllByOrderByFirstNameDesc();
+            }
+            else{
+                return contactRepository.findAllByOrderByFirstNameAsc();
+            }
         }
-        return contactRepository.findByFilter(searchTerm);
+        else{
+            if(isNullorEmpty(sort)){
+                return contactRepository.findBySearchTerm(searchTerm);
+            }
+            else if(sort.equalsIgnoreCase("desc")){
+                return contactRepository.findBySearchTermAndSortDesc(searchTerm);
+            }
+            else{
+                return contactRepository.findBySearchTermAndSortAsc(searchTerm);
+            }
+        }
     }
 
     public Contact getById(long id) {
